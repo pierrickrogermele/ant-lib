@@ -17,13 +17,15 @@
 	<dirname property="fr.cea.ant.lib.base.dir" file="${ant.file.fr.cea.ant.lib.base}"/>
 
 	<property name="build.dir" value="build"/>
+	<property name="src.dir" value="src"/>
+	<property name="src.gen.dir" value="src-gen"/>
 	<property name="test.dir" value="test"/>
 
 	<include file="utils.xml" as="utils"/>
 	<include file="compile.xml" as="compile"/>
 
 	<!-- SET PROPERTIES DYNAMICALLY -->
-	<macrodef name="setprops">
+	<macrodef name="set_props">
 		<attribute name="project"/>
 		<sequential>
 			<property name="project_name" value="@{project}"/>
@@ -33,17 +35,17 @@
 				</classpath> 
 
 				<!-- PROJECT NAME -->
-				<!--String prj_name = project.getName();-->
 				String prj_name = project.getProperty("project_name");
 
 				<!-- PROJECT DIR -->
 				String prj_dir = new java.io.File(project.getProperty("ant.file." + prj_name)).getParent();
-				project.setProperty(prj_name + "dir", prj_dir);
+				project.setProperty(prj_name + ".dir", prj_dir);
 
 				<!-- SRC -->
-				String src_dir = "src";
+				String src_dir = project.getProperty("src.dir");
 				project.setProperty(prj_name + ".src.dir", src_dir);
-				project.addReference(prj_name + ".src", new org.apache.tools.ant.types.Path(project, prj_dir + java.io.File.separator + src_dir));
+				project.addReference(prj_name + ".src",new org.apache.tools.ant.types.Path(project, prj_dir + java.io.File.separator + src_dir));
+				project.setProperty(prj_name + ".src.dirs", src_dir);
 
 				<!-- JAR BASENAME -->
 				String jar_basename_key = prj_name + ".jar.basename";
@@ -72,10 +74,67 @@
 		</sequential>
 	</macrodef>
 
+
+	<!-- ADD A DIRECTORY OF GENERATED SOURCES -->
+	<macrodef name="add_gen_src_dir">
+		<attribute name="project"/>
+		<attribute name="dir"/>
+		<sequential>
+			<property name="project_name" value="@{project}"/>
+			<property name="gen_src_dir" value="@{dir}"/>
+			<script language="beanshell" setbeans="true">
+				<classpath>
+					<fileset dir="${fr.cea.ant.lib.base.dir}" includes="*.jar"/>
+				</classpath> 
+
+				<!-- Get parameters -->
+				String prj_name = project.getProperty("project_name");
+				String gen_src_dir = project.getProperty("gen_src_dir");
+
+				<!-- Add directory to source directories property -->
+				project.setProperty(prj_name + ".src.dirs", project.getProperty(prj_name + ".src.dirs") + ";" + gen_src_dir);
+
+				<!-- Add directory to source path reference -->
+				java.io.File gen_src = new java.io.File(project.getProperty(prj_name + ".dir") + java.io.File.separator + gen_src_dir);
+				org.apache.tools.ant.types.Path src_ref = (org.apache.tools.ant.types.Path)project.getReference(prj_name + ".src");
+				src_ref.setLocation(gen_src);
+
+				<!-- Update clean target -->
+				org.apache.tools.ant.Target clean_target = (org.apache.tools.ant.Target)project.getTargets().get("clean");
+				org.apache.tools.ant.taskdefs.Delete delete_task = (org.apache.tools.ant.taskdefs.Delete)project.createTask("delete");
+				delete_task.setDir(gen_src);
+				clean_target.addTask(delete_task);
+			</script>
+		</sequential>
+	</macrodef>
+
+	<!-- ADD A DEPENDENCY TARGET FOR COMPILE TARGET -->
+	<macrodef name="add_compile_dependency">
+		<attribute name="project"/>
+		<attribute name="dependency"/>
+		<sequential>
+			<property name="project_name" value="@{project}"/>
+			<property name="dependency" value="@{dependency}"/>
+			<script language="beanshell" setbeans="true">
+				<classpath>
+					<fileset dir="${fr.cea.ant.lib.base.dir}" includes="*.jar"/>
+				</classpath> 
+
+				<!-- Get parameters -->
+				String prj_name = project.getProperty("project_name");
+				String dependency = project.getProperty("dependency");
+
+				<!-- Update compile target -->
+				org.apache.tools.ant.Target compile_target = (org.apache.tools.ant.Target)project.getTargets().get("compile");
+				compile_target.addDependency(dependency);
+			</script>
+		</sequential>
+	</macrodef>
+
 	<!-- COMPILE -->
 	<target name="compile">
 		<mkdir dir="${build.dir}/${mode}"/>
-		<javac srcdir="${${ant.project.name}.src.dir}" destdir="${build.dir}/${mode}" includeantruntime="false"  debug="${javac.debug}" debuglevel="${javac.debug.level}" classpathref="${ant.project.name}.jars.dep.${mode}"/>
+		<javac srcdir="${${ant.project.name}.src.dirs}" destdir="${build.dir}/${mode}" includeantruntime="false"  debug="${javac.debug}" debuglevel="${javac.debug.level}" classpathref="${ant.project.name}.jars.dep.${mode}"/>
 	</target>
 
 	<!-- JAR PACKAGE -->
