@@ -1,0 +1,13 @@
+<!-- vi: se ft=ant: -->
+
+<project>
+
+	<!-- OS detection -->
+	<condition property="isMac">
+		<os family="mac"/>
+	</condition>
+	<condition property="isWindows">
+		<os family="windows"/>
+	</condition>
+
+</project>

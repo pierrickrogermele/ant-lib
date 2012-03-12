@@ -1,0 +1,82 @@
+<project default="all">
+
+	<!-- include file to test -->
+	<include file="../../../compile.xml" as="compile"/>
+
+	<!-- directories -->
+	<property name="src.dir" value="src"/>
+	<property name="build.dir" value="build"/>
+
+	<!-- CHECK -->
+	<target name="check">
+		<property name="class.file" value="${build.dir}/${mode}/MyClass"/>
+		<property name="tmp.file" value="javap.output.tmp"/>
+
+		<!-- run javap to disassemble java class -->
+		<exec executable="javap" output="${tmp.file}">
+			<arg value="-l"/>
+			<arg value="${class.file}"/>
+		</exec>
+
+		<!-- look for "line number" and "local variable" tables in disassemble code -->
+		<exec executable="grep" input="${tmp.file}" resultproperty="dont.have.line.number.table" output="/dev/null">
+			<arg value="LineNumberTable"/>
+		</exec>
+		<exec executable="grep" input="${tmp.file}" resultproperty="dont.have.local.variable.table" output="/dev/null">
+			<arg value="LocalVariableTable"/>
+		</exec>
+
+		<!-- Test that class contains or doesn't contain debug information -->
+		<fail message="Class file has been compiled with the wrong debug options in ${mode} mode !">
+			<condition>
+				<or>
+
+					<!-- Debug version of class must contain both info tables -->
+					<and>
+						<isset property="debug-mode"/>
+						<or>
+							<equals arg1="${dont.have.line.number.table}" arg2="1"/>
+							<equals arg1="${dont.have.local.variable.table}" arg2="1"/>
+						</or>
+					</and>
+
+					<!-- Release version of class must contain no info tables -->
+					<and>
+						<isset property="release-mode"/>
+						<or>
+							<equals arg1="${dont.have.line.number.table}" arg2="0"/>
+							<equals arg1="${dont.have.local.variable.table}" arg2="0"/>
+						</or>
+					</and>
+				</or>
+			</condition>
+		</fail>
+	</target>
+
+	<!-- COMPILE -->
+	<target name="compile">
+		<mkdir dir="${build.dir}/${mode}"/>
+		<javac srcdir="${src.dir}" destdir="${build.dir}/${mode}" includeantruntime="false" debug="${javac.debug}" debuglevel="${javac.debug.level}"/>
+	</target>
+
+	<!-- DEBUG -->
+	<target name="debug" depends="compile.debug,compile,check"/>
+
+	<!-- RELEASE -->
+	<target name="release" depends="compile.release,compile,check"/>
+
+	<!-- ALL -->
+	<target name="all">
+		<antcall target="debug"/>
+		<antcall target="release"/>
+	</target>
+
+	<!-- CLEAN -->
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+		<delete>
+			<fileset dir="."><include name="*.tmp"/></fileset>
+		</delete>
+	</target>
+
+</project>

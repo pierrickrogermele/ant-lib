@@ -1,0 +1,8 @@
+<!-- vi: se ft=ant : -->
+<project name="build.lib.javacc">
+
+	<dirname property="build.lib.javacc.dir" file="${ant.file.build.lib.javacc}"/>
+
+	<property name="javacc.home" value="${build.lib.javacc.dir}"/>
+
+</project>

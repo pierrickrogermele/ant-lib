@@ -1,0 +1,7 @@
+To install AntLogger
+====================
+1) compile by running 'ant' command inside this directory
+2) define and export the following variable in your environment
+export ANT_ARGS="-logger fr.cea.lib.AntLogger"
+3) adjust your CLASSPATH by adding the following absolute path to it: 
+<this_dir>/build

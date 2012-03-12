@@ -1,0 +1,112 @@
+<!-- vi: se ft=ant: -->
+<!-- DESCRIPTION
+     This module is for being included by projects, in order to
+     avoid them to define simple targets.
+     All needed targets (compile, clean, ...) and properties for a simple project are provided by this module.
+  -->
+
+<!-- REQUIREMENTS
+     The project that includes this module must define the following properties:
+     <project_name>.src.dir
+     <project_name>.jar.debug
+     <project_name>.jar.release
+  -->
+
+<project name="fr.cea.ant.lib.base">
+	
+	<dirname property="fr.cea.ant.lib.base.dir" file="${ant.file.fr.cea.ant.lib.base}"/>
+
+	<property name="build.dir" value="build"/>
+	<property name="test.dir" value="test"/>
+
+	<include file="utils.xml" as="utils"/>
+	<include file="compile.xml" as="compile"/>
+
+	<!-- SET PROPERTIES DYNAMICALLY -->
+	<macrodef name="setprops">
+		<attribute name="project"/>
+		<sequential>
+			<property name="project_name" value="@{project}"/>
+			<script language="beanshell" setbeans="true">
+				<classpath>
+					<fileset dir="${fr.cea.ant.lib.base.dir}" includes="*.jar"/>
+				</classpath> 
+
+				<!-- PROJECT NAME -->
+				<!--String prj_name = project.getName();-->
+				String prj_name = project.getProperty("project_name");
+
+				<!-- PROJECT DIR -->
+				String prj_dir = new java.io.File(project.getProperty("ant.file." + prj_name)).getParent();
+				project.setProperty(prj_name + "dir", prj_dir);
+
+				<!-- SRC -->
+				String src_dir = "src";
+				project.setProperty(prj_name + ".src.dir", src_dir);
+				project.addReference(prj_name + ".src", new org.apache.tools.ant.types.Path(project, prj_dir + java.io.File.separator + src_dir));
+
+				<!-- JAR BASENAME -->
+				String jar_basename_key = prj_name + ".jar.basename";
+				String jar_basename = project.getProperty(jar_basename_key);
+				if (jar_basename == null) {
+					jar_basename = prj_name;
+					project.setProperty(jar_basename_key, prj_name);
+				}
+
+				<!-- JARS -->
+				String[] mode = {"debug", "release"};
+				for (int m = 0 ; m != mode.length ; ++m) {
+					<!-- DEPS -->
+					String jars_dep_key = prj_name + ".jars.dep." + mode[m];
+					if ( ! project.hasReference(jars_dep_key))
+						project.addReference(jars_dep_key, new org.apache.tools.ant.types.Path(project));
+
+					String jar_path = prj_dir + java.io.File.separator + jar_basename + "." + mode[m] + ".jar";
+					project.setProperty(prj_name + ".jar." + mode[m], jar_path);
+					org.apache.tools.ant.types.Path jars_path = new org.apache.tools.ant.types.Path(project, jar_path);
+					jars_path.add((org.apache.tools.ant.types.Path)project.getReference(jars_dep_key));
+					String jars_ref_key = prj_name + ".jars." + mode[m];
+					project.addReference(jars_ref_key, jars_path);
+				}
+			</script>
+		</sequential>
+	</macrodef>
+
+	<!-- COMPILE -->
+	<target name="compile">
+		<mkdir dir="${build.dir}/${mode}"/>
+		<javac srcdir="${${ant.project.name}.src.dir}" destdir="${build.dir}/${mode}" includeantruntime="false"  debug="${javac.debug}" debuglevel="${javac.debug.level}" classpathref="${ant.project.name}.jars.dep.${mode}"/>
+	</target>
+
+	<!-- JAR PACKAGE -->
+	<target name="jar" depends="utils.nested,compile">
+		<jar basedir="${build.dir}/${mode}" destfile="${${ant.project.name}.jar.${mode}}"/>
+	</target>
+
+	<!-- DEBUG -->
+	<target name="debug" depends="compile.debug,jar"/>
+
+	<!-- RELEASE -->
+	<target name="release" depends="compile.release,jar"/>
+
+	<!-- ALL -->
+	<target name="all">
+		<antcall target="debug"/>
+		<antcall target="release"/>
+	</target>
+
+	<!-- TEST --> 
+	<target name="test" depends="all">
+		<ant dir="test" inheritAll="false"/>
+	</target>
+
+	<!-- CLEAN -->
+	<target name="clean">
+		<ant dir="test" target="clean" inheritAll="false"/>
+		<delete dir="${build.dir}"/>
+		<delete>
+			<fileset dir="."><include name="*.jar"/></fileset>
+		</delete>
+	</target>
+
+</project>

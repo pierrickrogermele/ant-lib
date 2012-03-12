@@ -1,0 +1,38 @@
+<!-- vi: se ft=ant: -->
+
+<project name="fr.cea.build.lib.matlab">
+
+	<include file="system.xml" as="system"/>
+
+	<!-- MATLAB COMMAND -->
+	<condition property="matlab-cmd-arg-display" value="-nosplash">
+		<isset property="isWindows"/>
+	</condition>
+	<condition property="matlab-cmd-arg-wait" value="-wait">
+		<isset property="isWindows"/>
+	</condition>
+	<property name="matlab-cmd-arg-display" value="-nodisplay"/>
+	<property name="matlab-cmd-arg-wait" value=""/>
+	<property name="matlab-cmd-arg-run" value="-r"/>
+
+	<!-- EXEC MATLAB FUNCTION -->
+	<macrodef name="matlab">
+		<attribute name="fct"/>
+		<attribute name="dir" default="."/>
+		<sequential>
+			<exec executable="matlab" dir="@{dir}" outputproperty="matlab.output" failonerror="true">
+				<arg value="${matlab-cmd-arg-display}"/>
+				<arg value="${matlab-cmd-arg-wait}"/>
+				<arg value="${matlab-cmd-arg-run}"/>
+				<arg value="@{fct};quit"/>
+			</exec>
+			<echo>${matlab.output}</echo>
+			<fail>
+				<condition>
+					<contains string="${matlab.output}" substring="Error"/>
+				</condition>
+			</fail>
+		</sequential>
+	</macrodef>
+
+</project>

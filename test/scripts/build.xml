@@ -1,0 +1,29 @@
+<project name="fr.cea.build.lib.ant.test.scripts" default="all">
+
+<!--	    <script language="javascript"><![CDATA[
+		    echo = fr_cea_buildlib_base.createTask("echo");
+		            echo.setMessage("COUCOU");
+			            echo.perform();
+		       ]]></script>-->
+		       
+<!--		       <script language="jython">
+	    <classpath>
+	    <fileset dir="." includes="*.jar" />
+	     </classpath> 
+		       print "COUCOU
+		           </script>-->
+
+		<script language="beanshell" setbeans="true">
+			<classpath>
+				<fileset dir="../.." includes="*.jar" />
+			</classpath> 
+System.out.println("COUCOU");
+System.out.println("All Properties: " + project.getProperties().keySet());
+		</script>
+	<target name="bsh.script">
+	</target>
+
+	<!-- ALL -->
+	<target name="all" depends="bsh.script"/>
+
+</project>

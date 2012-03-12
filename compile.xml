@@ -1,0 +1,25 @@
+<!-- vi: se ft=ant : -->
+<project>
+
+	<!-- ======================================================================= -->
+	<!-- DEBUG / RELEASE -->
+
+	<property name="javac.debug.level.full" value="lines,vars,source"/>
+
+	<!-- DEBUG -->
+	<target name="debug">
+		<property name="debug-mode" value="true"/>
+		<property name="mode" value="debug"/>
+		<property name="javac.debug" value="true"/>
+		<property name="javac.debug.level" value="${javac.debug.level.full}"/>
+	</target>
+
+	<!-- RELEASE -->
+	<target name="release">
+		<property name="release-mode" value="true"/>
+		<property name="mode" value="release"/>
+		<property name="javac.debug" value="false"/>
+		<property name="javac.debug.level" value="none"/>
+	</target>  
+
+</project>

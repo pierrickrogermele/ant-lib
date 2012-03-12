@@ -1,0 +1,36 @@
+<project name="ant.extensions" default="all">
+	
+	<!-- PROPERTIES -->
+	<property name="build.dir" value="build"/>
+	<property name="src.dir" value="src"/>
+
+	<!-- ANT JAR CLASSPATH -->
+	<condition property="ant.jar" value="/usr/share/ant/lib/ant.jar">
+		<os family="unix"/>
+	</condition>
+	<condition property="ant.jar" value="C:/apache-ant-1.8.2/lib/ant.jar">
+		<os family="windows"/>
+	</condition>
+
+	<!-- COMPILE -->
+  <target name="compile">
+    <mkdir dir="${build.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="none" classpath="${ant.jar}">
+			<compilerarg value="-Xlint"/>
+		</javac>
+  </target>
+
+	<!-- ALL -->
+	<target	name="all" depends="compile"/>
+
+	<!-- TEST -->
+	<target name="test">
+		<ant dir="test" inheritAll="false"/>
+	</target>
+
+	<!-- CLEAN -->
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+
+</project>

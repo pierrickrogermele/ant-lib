@@ -1,0 +1,20 @@
+<project default="all">
+
+	<include file="../../../utils.xml" as="utils"/>
+
+	<!-- NESTED PROPERTIES -->
+	<target name="nested" depends="utils.nested">
+		<echo>Running "Nested Properties" test...</echo>
+		<property name="a_ext" value="some_value"/>
+		<property name="b" value="ext"/>
+		<fail message="Nested properties aren't expanded correctly !">
+			<condition>
+				<not><equals arg1="${a_${b}}" arg2="${a_ext}"/></not>
+			</condition>
+		</fail>
+	</target>
+
+	<!-- ALL -->
+	<target name="all" depends="nested"/>
+
+</project>

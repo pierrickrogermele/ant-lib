@@ -1,0 +1,32 @@
+<!-- vi: se ft=ant: -->
+
+<project name="fr.cea.build.lib.python">
+
+	<include file="system.xml" as="system"/>
+
+	<!-- PYTHON COMMAND -->
+	<condition property="python-cmd" value="CMD">
+		<isset property="isWindows"/>
+	</condition>
+	<condition property="python-cmd-arg" value="/C">
+		<isset property="isWindows"/>
+	</condition>
+	<condition property="python-cmd-path-prefix" value="">
+		<isset property="isWindows"/>
+	</condition>
+	<property name="python-cmd" value="/usr/bin/env"/>
+	<property name="python-cmd-arg" value="python"/>
+	<property name="python-cmd-path-prefix" value="./"/>
+
+	<!-- EXEC PYTHON SCRIPT -->
+	<macrodef name="python">
+		<attribute name="script"/>
+		<sequential>
+			<exec executable="${python-cmd}" failonerror="true">
+				<arg value="${python-cmd-arg}"/>
+				<arg value="${python-cmd-path-prefix}@{script}"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+</project>

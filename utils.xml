@@ -1,0 +1,19 @@
+<!-- vi: se ft=ant: -->
+<project name="build.lib.utils">
+
+	<dirname property="build.lib.utils.dir" file="${ant.file.build.lib.utils}"/>
+
+	<!-- NESTED PROPERTY EXPANDER 
+			 Necessary to expand nested properties like ${my.var.${some.other.var}}
+	-->
+	<target name="nested">
+		<ant dir="${build.lib.utils.dir}" inheritAll="false"/>
+		<typedef classname="org.apache.ant.props.NestedPropertyExpander"
+						 name="nested_property_expander"
+						 classpath="${build.lib.utils.dir}/build"/>
+		<propertyhelper>
+			<nested_property_expander/>
+		</propertyhelper>
+	</target>
+
+</project>
