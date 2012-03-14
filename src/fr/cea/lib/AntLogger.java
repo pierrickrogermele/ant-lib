@@ -65,11 +65,9 @@ public class AntLogger implements BuildLogger, org.apache.tools.ant.SubBuildList
 				}
 
 				// print stack of messages for top directory
-				java.util.Iterator i = dir.messages.iterator();
-				while (i.hasNext()) {
-					String msg = (String)i.next();
-					this.out.println(msg);
-				}
+				java.util.Iterator<String> i = dir.messages.iterator();
+				while (i.hasNext())
+					this.out.println(i.next());
 			}
 
 			// print message for leaving top directory
