@@ -1,8 +1,8 @@
 <!-- vi: se ft=ant : -->
-<project name="build.lib.javacc">
+<project name="fr.cea.ant.lib.javacc">
 
-	<dirname property="build.lib.javacc.dir" file="${ant.file.build.lib.javacc}"/>
+	<dirname property="fr.cea.ant.lib.javacc.dir" file="${ant.file.fr.cea.ant.lib.javacc}"/>
 
-	<property name="javacc.home" value="${build.lib.javacc.dir}"/>
+	<property name="javacc.home" value="${fr.cea.ant.lib.javacc.dir}"/>
 
 </project>

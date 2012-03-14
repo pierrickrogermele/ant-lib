@@ -1,6 +1,6 @@
 <!-- vi: se ft=ant: -->
 
-<project name="fr.cea.build.lib.matlab">
+<project name="fr.cea.ant.lib.matlab">
 
 	<include file="system.xml" as="system"/>
 

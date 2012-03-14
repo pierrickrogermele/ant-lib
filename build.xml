@@ -1,4 +1,4 @@
-<project name="ant.extensions" default="all">
+<project name="fr.cea.ant.lib" default="all">
 	
 	<!-- PROPERTIES -->
 	<property name="build.dir" value="build"/>

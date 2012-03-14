@@ -1,6 +1,6 @@
 <!-- vi: se ft=ant: -->
 
-<project name="fr.cea.build.lib.python">
+<project name="fr.cea.ant.lib.python">
 
 	<include file="system.xml" as="system"/>
 

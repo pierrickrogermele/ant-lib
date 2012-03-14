@@ -1,14 +1,14 @@
 <!-- vi: se ft=ant: -->
-<project name="fr.cea.build.lib.test">
+<project name="fr.cea.ant.lib.test">
 	
 	<include file="system.xml" as="system"/>
 
-	<dirname property="fr.cea.build.lib.test" file="${ant.file.fr.cea.build.lib.test}" />
+	<dirname property="fr.cea.ant.lib.test" file="${ant.file.fr.cea.ant.lib.test}" />
 
 	<!-- JUNIT -->
 	<condition property="junit.jar" value="/usr/share/java/junit.jar">
 		<isset property="isMac"/>
 	</condition>
-	<property name="junit.jar" value="${fr.cea.build.lib.test}/junit-4.10.jar"/>
+	<property name="junit.jar" value="${fr.cea.ant.lib.test}/junit-4.10.jar"/>
 
 </project>
