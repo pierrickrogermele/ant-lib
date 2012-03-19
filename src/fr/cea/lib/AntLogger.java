@@ -88,7 +88,7 @@ public class AntLogger implements BuildLogger, org.apache.tools.ant.SubBuildList
 		java.lang.Throwable ex = event.getException();
 		if (ex != null && ! this.exceptions.contains(ex)) {
 			Project project = event.getProject();
-			project.log("ANT EXCEPTION !: " + ex.toString(), Project.MSG_ERR);
+			project.log(ex.toString(), Project.MSG_ERR);
 			this.exceptions.add(ex);
 		}
 	}

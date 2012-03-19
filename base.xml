@@ -25,29 +25,31 @@
 	<include file="compile.xml" as="compile"/>
 
 	<!-- SET PROPERTIES DYNAMICALLY -->
-	<macrodef name="set_props">
+	<macrodef name="init_base">
 		<attribute name="project"/>
+		<attribute name="test" default="false"/>
 		<sequential>
-			<property name="project_name" value="@{project}"/>
 			<script language="beanshell" setbeans="true">
 				<classpath>
 					<fileset dir="${fr.cea.ant.lib.base.dir}" includes="*.jar"/>
 				</classpath> 
+				// ec-begin:java
 
-				<!-- PROJECT NAME -->
-				String prj_name = project.getProperty("project_name");
+				// PROJECT NAME
+				String prj_name = "@{project}";
+				boolean test    = "@{test}".equals("true");
 
-				<!-- PROJECT DIR -->
+				// PROJECT DIR
 				String prj_dir = new java.io.File(project.getProperty("ant.file." + prj_name)).getParent();
 				project.setProperty(prj_name + ".dir", prj_dir);
 
-				<!-- SRC -->
+				// SRC
 				String src_dir = project.getProperty("src.dir");
 				project.setProperty(prj_name + ".src.dir", src_dir);
 				project.addReference(prj_name + ".src",new org.apache.tools.ant.types.Path(project, prj_dir + java.io.File.separator + src_dir));
 				project.setProperty(prj_name + ".src.dirs", src_dir);
 
-				<!-- JAR BASENAME -->
+				// JAR BASENAME
 				String jar_basename_key = prj_name + ".jar.basename";
 				String jar_basename = project.getProperty(jar_basename_key);
 				if (jar_basename == null) {
@@ -55,7 +57,7 @@
 					project.setProperty(jar_basename_key, prj_name);
 				}
 
-				<!-- JARS -->
+				// JARS
 				String[] mode = {"debug", "release"};
 				for (int m = 0 ; m != mode.length ; ++m) {
 					<!-- DEPS -->
@@ -70,40 +72,121 @@
 					String jars_ref_key = prj_name + ".jars." + mode[m];
 					project.addReference(jars_ref_key, jars_path);
 				}
+
+				// Create following targets only if we are in the right project
+				if (project.getName().equals(prj_name)) {
+
+					// MODE
+					String[] modes = {"debug", "release"};
+					for (int m = 0 ; m != modes.length ; ++m) {
+						org.apache.tools.ant.Target target_mode = new org.apache.tools.ant.Target();
+						target_mode.setName(modes[m]);
+						target_mode.setDepends("compile."+modes[m]+",jar");
+						project.addTarget(target_mode);
+					}
+
+					// ALL
+					org.apache.tools.ant.Target target_all = new org.apache.tools.ant.Target();
+					target_all.setName("all");
+					for (int m = 0 ; m != modes.length ; ++m) {
+						org.apache.tools.ant.taskdefs.CallTarget mode_call = (org.apache.tools.ant.taskdefs.CallTarget)project.createTask("antcall");
+						mode_call.setTarget(modes[m]);
+						target_all.addTask(mode_call);
+					}
+					project.addTarget(target_all);
+
+					// TEST
+					if (test) {
+						org.apache.tools.ant.Target target_test = new org.apache.tools.ant.Target();
+						target_test.setName("test");
+						target_test.addDependency("all");
+						project.addTarget(target_test);
+
+						org.apache.tools.ant.taskdefs.Ant ant_task = (org.apache.tools.ant.taskdefs.Ant)project.createTask("ant");
+						ant_task.setDir(new java.io.File(project.getProperty("test.dir")));
+						ant_task.setInheritAll(false);
+						target_test.addTask(ant_task);
+					}
+
+					// CLEAN
+					{
+						// create target
+						org.apache.tools.ant.Target target_clean = new org.apache.tools.ant.Target();
+						target_clean.setName("clean");
+						project.addTarget(target_clean);
+
+						// clean test subdir
+						if (test) {
+							org.apache.tools.ant.taskdefs.Ant ant_task = (org.apache.tools.ant.taskdefs.Ant)project.createTask("ant");
+							ant_task.setDir(new java.io.File(project.getProperty("test.dir")));
+							ant_task.setTarget("clean");
+							ant_task.setInheritAll(false);
+							target_clean.addTask(ant_task);
+						}
+
+						// remove build dir
+						java.io.File build_dir = new java.io.File(project.getProperty("build.dir"));
+						if (build_dir.exists()) {
+							org.apache.tools.ant.taskdefs.Delete del_build_dir_task = (org.apache.tools.ant.taskdefs.Delete)project.createTask("delete");
+							del_build_dir_task.setDir(build_dir);
+							target_clean.addTask(del_build_dir_task);
+						}
+
+						// remove jar files
+						org.apache.tools.ant.taskdefs.Delete del_jars_task = (org.apache.tools.ant.taskdefs.Delete)project.createTask("delete");
+						org.apache.tools.ant.types.FileSet file_set = new org.apache.tools.ant.types.FileSet();
+						file_set.setDir(new java.io.File(prj_dir));
+						file_set.setIncludes("*.jar");
+						del_jars_task.addFileset(file_set);
+						target_clean.addTask(del_jars_task);
+					}
+				}
+
+				// ec-end:java
 			</script>
 		</sequential>
 	</macrodef>
 
 
-	<!-- ADD A DIRECTORY OF GENERATED SOURCES -->
-	<macrodef name="add_gen_src_dir">
+	<!-- ADD DIRECTIVES FOR GENERATED SOURCES -->
+	<macrodef name="add_generated_sources">
 		<attribute name="project"/>
-		<attribute name="dir"/>
+		<attribute name="dir" default="${src.gen.dir}"/>
+		<attribute name="gentarget"/>
 		<sequential>
-			<property name="project_name" value="@{project}"/>
-			<property name="gen_src_dir" value="@{dir}"/>
 			<script language="beanshell" setbeans="true">
 				<classpath>
 					<fileset dir="${fr.cea.ant.lib.base.dir}" includes="*.jar"/>
 				</classpath> 
+				// ec-begin:java
 
-				<!-- Get parameters -->
-				String prj_name = project.getProperty("project_name");
-				String gen_src_dir = project.getProperty("gen_src_dir");
+				// Get parameters
+				String prj_name = "@{project}";
+				String gen_src_dir = "@{dir}";
+				String gen_target = "@{gentarget}";
 
-				<!-- Add directory to source directories property -->
+				// Add directory to source directories property
 				project.setProperty(prj_name + ".src.dirs", project.getProperty(prj_name + ".src.dirs") + ";" + gen_src_dir);
 
-				<!-- Add directory to source path reference -->
+				// Add directory to source path reference
 				java.io.File gen_src = new java.io.File(project.getProperty(prj_name + ".dir") + java.io.File.separator + gen_src_dir);
 				org.apache.tools.ant.types.Path src_ref = (org.apache.tools.ant.types.Path)project.getReference(prj_name + ".src");
 				src_ref.setLocation(gen_src);
 
-				<!-- Update clean target -->
-				org.apache.tools.ant.Target clean_target = (org.apache.tools.ant.Target)project.getTargets().get("clean");
-				org.apache.tools.ant.taskdefs.Delete delete_task = (org.apache.tools.ant.taskdefs.Delete)project.createTask("delete");
-				delete_task.setDir(gen_src);
-				clean_target.addTask(delete_task);
+				// Update following targets only if we are in the right project
+				if (project.getName().equals(prj_name)) {
+
+					// Update clean target
+					org.apache.tools.ant.Target clean_target = (org.apache.tools.ant.Target)project.getTargets().get("clean");
+					org.apache.tools.ant.taskdefs.Delete delete_task = (org.apache.tools.ant.taskdefs.Delete)project.createTask("delete");
+					delete_task.setDir(gen_src);
+					clean_target.addTask(delete_task);
+
+					// Update compile target
+					org.apache.tools.ant.Target compile_target = (org.apache.tools.ant.Target)project.getTargets().get("compile");
+					compile_target.addDependency(gen_target);
+				}
+				// ec-end:java
 			</script>
 		</sequential>
 	</macrodef>
@@ -113,20 +196,20 @@
 		<attribute name="project"/>
 		<attribute name="dependency"/>
 		<sequential>
-			<property name="project_name" value="@{project}"/>
-			<property name="dependency" value="@{dependency}"/>
 			<script language="beanshell" setbeans="true">
 				<classpath>
 					<fileset dir="${fr.cea.ant.lib.base.dir}" includes="*.jar"/>
 				</classpath> 
+				// ec-begin:java
 
-				<!-- Get parameters -->
-				String prj_name = project.getProperty("project_name");
-				String dependency = project.getProperty("dependency");
+				// Get parameters
+				String prj_name = "@{project}";
+				String dependency = "@{dependency}";
 
-				<!-- Update compile target -->
+				// Update compile target
 				org.apache.tools.ant.Target compile_target = (org.apache.tools.ant.Target)project.getTargets().get("compile");
 				compile_target.addDependency(dependency);
+				// ec-end:java
 			</script>
 		</sequential>
 	</macrodef>
@@ -143,29 +226,29 @@
 	</target>
 
 	<!-- DEBUG -->
-	<target name="debug" depends="compile.debug,jar"/>
+	<!-- <target name="debug" depends="compile.debug,jar"/>-->
 
 	<!-- RELEASE -->
-	<target name="release" depends="compile.release,jar"/>
+	<!--<target name="release" depends="compile.release,jar"/>-->
 
 	<!-- ALL -->
-	<target name="all">
+<!--	<target name="all">
 		<antcall target="debug"/>
 		<antcall target="release"/>
 	</target>
-
+-->
 	<!-- TEST --> 
-	<target name="test" depends="all">
+<!--	<target name="test" depends="all">
 		<ant dir="test" inheritAll="false"/>
 	</target>
-
+-->
 	<!-- CLEAN -->
-	<target name="clean">
+<!--	<target name="clean">
 		<ant dir="test" target="clean" inheritAll="false"/>
 		<delete dir="${build.dir}"/>
 		<delete>
 			<fileset dir="."><include name="*.jar"/></fileset>
 		</delete>
 	</target>
-
+-->
 </project>

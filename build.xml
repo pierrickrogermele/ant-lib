@@ -13,12 +13,12 @@
 	</condition>
 
 	<!-- COMPILE -->
-  <target name="compile">
-    <mkdir dir="${build.dir}"/>
-    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="none" classpath="${ant.jar}">
+	<target name="compile">
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="none" classpath="${ant.jar}">
 			<compilerarg value="-Xlint"/>
 		</javac>
-  </target>
+	</target>
 
 	<!-- ALL -->
 	<target	name="all" depends="compile"/>
@@ -29,8 +29,8 @@
 	</target>
 
 	<!-- CLEAN -->
-  <target name="clean">
-    <delete dir="${build.dir}"/>
-  </target>
+	<target name="clean">
+	<delete dir="${build.dir}"/>
+	</target>
 
 </project>

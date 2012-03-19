@@ -1,0 +1,6 @@
+<project name="fr.cea.ant.lib.test.base.test" default="all">
+
+	<import file="../../../base.xml"/>
+	<init_base project="fr.cea.ant.lib.test.base.test" test="false"/> 
+
+</project>
