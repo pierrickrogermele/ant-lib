@@ -103,7 +103,7 @@
 						project.addTarget(target_test);
 
 						org.apache.tools.ant.taskdefs.Ant ant_task = (org.apache.tools.ant.taskdefs.Ant)project.createTask("ant");
-						ant_task.setDir(new java.io.File(project.getProperty("test.dir")));
+						ant_task.setDir(new java.io.File(prj_dir + java.io.File.separator + project.getProperty("test.dir")));
 						ant_task.setInheritAll(false);
 						target_test.addTask(ant_task);
 					}
