@@ -1,4 +1,11 @@
 <!-- vi: se ft=ant: -->
+
+<!-- DEPRECATED 
+	 Reasons:
+	 _ The extensive/recursive use of beanshell in big projects, can lead to overflows in ant.
+	 _ The creation of tasks at runtime, make projects less maintanable.
+  -->
+
 <!-- DESCRIPTION
      This module is for being included by projects, in order to
      avoid them to define simple targets.
