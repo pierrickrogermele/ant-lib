@@ -17,7 +17,8 @@ def read_args():
 #############
 
 def print_buildxml(prj):
-	ant_lib_dir = '../ant-lib'
+	root_dir = '..'
+	ant_lib_dir = root_dir+'/ant-lib'
 	print('<project name="'+prj+'" default="all">')
 	print('')
 	print('	<dirname property="'+prj+'.dir" file="${ant.file.'+prj+'}"/>')
@@ -27,6 +28,7 @@ def print_buildxml(prj):
 	print('')
 	print('	<include file="'+ant_lib_dir+'/utils.xml" as="utils"/>')
 	print('	<include file="'+ant_lib_dir+'/compile.xml" as="compile"/>')
+	print('	<include file="'+root_dir+'/java-lib/build.xml" as="java.lib"/>')
 	print('')
 	print('	<!-- SRC -->')
 	print('	<property name="src.dir" value="src"/>')
@@ -36,7 +38,6 @@ def print_buildxml(prj):
 	print('	<property name="'+prj+'.src.dirs" refid="'+prj+'.src"/>')
 	print('')
 	print('	<!-- DEPS -->')
-	print('	<include file="../java-lib/build.xml" as="java.lib"/>')
 	print('	<path id="'+prj+'.jars.dep.debug">')
 	print('		<path refid="fr.cea.lib.jars.debug"/>')
 	print('	</path>')
