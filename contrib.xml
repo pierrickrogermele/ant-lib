@@ -1,0 +1,13 @@
+<!-- vi: se ft=ant: -->
+<project name="fr.cea.ant.lib.contrib">
+
+	<dirname property="fr.cea.ant.lib.contrib.dir" file="${ant.file.fr.cea.ant.lib.contrib}"/>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${fr.cea.ant.lib.contrib.dir}/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+	
+</project>
+

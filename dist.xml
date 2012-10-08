@@ -1,0 +1,75 @@
+<!-- vi: se ft=ant: -->
+<project name="fr.cea.ant.lib.dist">
+
+	<dirname property="fr.cea.ant.lib.dist.dir" file="${ant.file.fr.cea.ant.lib.dist}"/>
+
+	<include file="${fr.cea.ant.lib.dist.dir}/contrib.xml" as="contrib"/>
+
+	<!-- UNIX -->
+	<macrodef name="gen-java-unix-startup-script">
+		<attribute name="file"/>
+		<attribute name="classpathref"/>
+		<attribute name="mainclass"/>
+		<sequential>
+			<var name="s" value= ""/>
+			<for param="f">
+				<path refid="@{classpathref}"/>
+				<sequential>
+					<if>
+						<equals arg1="${s}" arg2=""/>
+						<then>
+							<var name="s" value= "@{f}"/> 
+						</then>
+						<else>
+							<var name="s" value= "${s}:@{f}"/> 
+						</else>
+					</if>
+				</sequential>
+			</for>
+			<delete file="@{file}"/>
+			<echo file="@{file}" append="true">#!/bin/sh
+
+java -cp ${s} @{mainclass} $*</echo>
+			<chmod file="@{file}" perm="u+x"/>
+		</sequential>
+	</macrodef>
+
+	<!-- WINDOWS -->
+	<macrodef name="gen-java-windows-startup-script">
+		<attribute name="file"/>
+		<attribute name="classpathref"/>
+		<attribute name="mainclass"/>
+		<sequential>
+			<var name="s" value=""/>
+			<for param="f">
+				<path refid="@{classpathref}"/>
+				<sequential>
+					<if>
+						<equals arg1="${s}" arg2=""/>
+						<then>
+							<var name="s" value="@{f}"/> 
+						</then>
+						<else>
+							<var name="s" value="${s};@{f}"/> 
+						</else>
+					</if>
+				</sequential>
+			</for>
+			<delete file="@{file}"/>
+			<echo file="@{file}" append="true">java -cp ${s} @{mainclass} %*</echo>
+		</sequential>
+	</macrodef>
+	
+	<!-- ALL PLATFORMS -->
+	<macrodef name="gen-java-startup-scripts">
+		<attribute name="name"/>
+		<attribute name="destdir"/>
+		<attribute name="classpathref"/>
+		<attribute name="mainclass"/>
+		<sequential>
+			<gen-java-unix-startup-script file="@{destdir}/@{name}" classpathref="@{classpathref}" mainclass="@{mainclass}"/>
+			<gen-java-windows-startup-script file="@{destdir}/@{name}.bat" classpathref="@{classpathref}" mainclass="@{mainclass}"/>
+		</sequential>
+	</macrodef>
+
+</project>
