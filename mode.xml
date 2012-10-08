@@ -1,8 +1,5 @@
 <!-- vi: se ft=ant : -->
-<project>
-
-	<!-- DEPRECATED -->
-	<echo level="warning">WARNING (fr.cea.ant.lib): Importing compile.xml is deprecated ! You must now include mode.xml.</echo>
+<project name="fr.cea.ant.lib.mode">
 
 	<property name="javac.debug.level.full" value="lines,vars,source"/>
 
@@ -23,3 +20,4 @@
 	</target>  
 
 </project>
+

@@ -21,10 +21,12 @@
 	<!-- EXEC PYTHON SCRIPT -->
 	<macrodef name="python">
 		<attribute name="script"/>
+		<element name="python-args"/>
 		<sequential>
 			<exec executable="${python-cmd}" failonerror="true">
 				<arg value="${python-cmd-arg}"/>
 				<arg value="${python-cmd-path-prefix}@{script}"/>
+				<python-args/>
 			</exec>
 		</sequential>
 	</macrodef>
