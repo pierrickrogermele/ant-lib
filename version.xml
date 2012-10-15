@@ -1,0 +1,11 @@
+<!-- vi: se ft=ant: -->
+<project name="fr.cea.ant.lib.version">
+
+	<!-- DATE TAG VERSION -->
+	<target name="datetag">
+        <tstamp>
+        	<format property="version" pattern="yyyyMMdd-HHmmss"/>
+		</tstamp>
+	</target>
+
+</project>
