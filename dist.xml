@@ -24,7 +24,7 @@ java -cp ${mycp} @{mainclass} $*</echo>
 		<attribute name="mainclass"/>
 		<sequential>
 			<pathconvert targetos="windows" property="mycp" refid="@{classpathref}"/>
-			<echo file="@{file}" append="true">java -cp ${s} @{mainclass} %*</echo>
+			<echo file="@{file}">java -cp ${s} @{mainclass} %*</echo>
 		</sequential>
 	</macrodef>
 	
