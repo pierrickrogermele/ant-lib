@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# This script runs a Java debugger by using information provided by local build.xml file.
+
+####################
+# GLOBAL VARIABLES #
+####################
+
+debugger=jdb
+
+########
+# HELP #
+########
+
+function help {
+	script_name="${0##*/}"
+	cat <<EOF
+Usage: $script_name [options] MainClassName
+Options:
+  -d    Set debugger to run. Default is $debugger.
+  -h    Print this message and exit.
+EOF
+	exit 0
+}
+
+#############
+# READ ARGS #
+#############
+
+function read_args {
+
+	# Read args
+	while getopts "hd:" option; do
+    	case "$option" in
+        	h) help ;;
+			d) debugger=$OPTARG ;;
+    	esac
+	done
+	shift $((OPTIND - 1))
+
+	# Get main class
+	if (($# == 0)) ; then
+		echo "You must specify a main class to run." >&2
+		exit 1
+	fi
+	main_class=$1
+	shift
+
+	# Too much arguments
+	if (($# > 0)) ; then
+		echo "Wrong number of arguments" >&2
+		exit 1
+	fi
+}
+
+#########
+# JUNIT #
+#########
+
+function detect_junit {
+	junit=$(echo $classpath | grep junit)
+	if [ -n "$junit" ] ; then
+		junit=true
+	fi
+}
+
+#############
+# BUILD.XML #
+#############
+
+function read_build_xml {
+
+	# Get classpath from build.xml
+	classpath=$(ant print-debug-classpath | grep '\[echo]' | sed 's/^.*\[echo] *//')
+
+	# Get sourcepath from build.xml
+	sourcepath=$(ant print-sourcepath | grep '\[echo]' | sed 's/^.*\[echo] *//')
+}
+
+################
+# RUN DEBUGGER #
+################
+
+function run_debugger {
+
+	# Set paths
+	options="-classpath $classpath -sourcepath $sourcepath"
+
+	# Use JUnit
+	if [ "$junit" = "true" ] ; then
+		options="$options org.junit.runner.JUnitCore"
+	fi
+
+	# run debugger
+	$debugger $options $main_class
+}
+
+########
+# MAIN #
+########
+read_args "$@"
+read_build_xml
+detect_junit
+run_debugger
