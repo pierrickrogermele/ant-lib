@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+
+import argparse
+
+##################
+# READ ARGUMENTS #
+##################
+
+def read_args():
+	parser = argparse.ArgumentParser(description='Generates a build.xml file for a project.')
+	parser.add_argument('-n', '--name', type=str, required=True, metavar='name', help='Name of the super project.')
+	parser.add_argument('-i', '--includes', type=str, nargs='*', metavar='project', help='list of projects on which this project depends, in the form of directory names.')
+	parser.add_argument('-d', '--dependencies', type=str, nargs='*', metavar='package_name', help='list of projects on which this project depends, in the form of package name (e.g.: fr.cea.lib).')
+	return parser.parse_args()
+
+####################
+# GENERATE DIRNAME #
+####################
+
+def generate_dirname(name):
+	print ''
+	print '\t<!-- THIS DIRECTORY -->'
+	print '\t<dirname property="{0}.dir" file="${{ant.file.{0}}}"/>'.format(name)
+
+#################
+# GENERATE DIRS #
+#################
+
+def generate_dirs():
+	print ''
+	print '\t<!-- DIRECTORIES -->'
+	print '\t<property name="build.dir" value="build"/>'
+	print '\t<property name="test.dir" value="test"/>'
+	print '\t<property name="src.dir" value="src"/>'
+
+
+#####################
+# GENERATE INCLUDES #
+#####################
+
+def generate_includes(includes):
+	print ''
+	print '\t<!-- INCLUDES -->'
+	print '\t<include file="../ant-lib/utils.xml" as="utils"/>'
+	print '\t<include file="../ant-lib/mode.xml" as="mode"/>'
+	if includes == None:
+		print '\t<!-- To include dependencies, use the following template: -->'
+		print '\t<!-- <include file="../my_other_project/mode.xml" as="my.other.project"/> -->'
+	else:
+		for p in includes:
+			q = p # TODO replace '-' with '.'
+			print '\t<include file="../{0}/build.xml" as="{1}"/>'.format(p, q)
+
+######################
+# GENERATE BUILD XML #
+######################
+
+def generate_build_xml(name, includes):
+	print '<project name="{0}" default="all">'.format(name)
+	generate_dirname(name)
+	generate_dirs()
+	generate_includes(includes)
+	print ''
+	print '</project>'
+
+########
+# MAIN #
+########
+
+args = read_args()
+generate_build_xml(args.name, args.includes args.dependencies)
