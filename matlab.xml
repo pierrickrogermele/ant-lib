@@ -20,16 +20,31 @@
 		<attribute name="fct"/>
 		<attribute name="dir" default="."/>
 		<sequential>
-			<exec executable="matlab" dir="@{dir}" outputproperty="matlab.output" failonerror="true">
+			<!-- Display matlab command -->
+			<echo message="Execute matlab inside directory @{dir}:"/>
+			<echo message="matlab ${matlab-cmd-arg-display} ${matlab-cmd-arg-wait} ${matlab-cmd-arg-run} '@{fct};quit'"/>
+
+			<!-- TODO Check that error canal works on Windows. Otherwise use output canal. -->
+			<exec executable="matlab" dir="@{dir}" errorproperty="matlab.err" failonerror="true">
 				<arg value="${matlab-cmd-arg-display}"/>
 				<arg value="${matlab-cmd-arg-wait}"/>
 				<arg value="${matlab-cmd-arg-run}"/>
 				<arg value="@{fct};quit"/>
 			</exec>
-			<echo>${matlab.output}</echo>
+
+			<!-- Display error messages -->
+			<concat>${matlab.err}<filterchain>
+					<tokenfilter>
+						<!-- Add .m extension to filenames for vi or emacs editors. -->
+						<replaceregex pattern="(Error in .*) \(" replace="\1.m (" flags="gi"/>
+					</tokenfilter>
+				</filterchain>
+			</concat>
+			
+			<!-- Fails if error detected in matlab messages -->
 			<fail>
 				<condition>
-					<contains string="${matlab.output}" substring="Error"/>
+					<contains string="${matlab.err}" substring="Error"/>
 				</condition>
 			</fail>
 		</sequential>
