@@ -5,13 +5,13 @@
 	<include file="system.xml" as="system"/>
 
 	<!-- MATLAB COMMAND -->
-	<condition property="matlab-cmd-arg-display" value="-nosplash">
+	<condition property="matlab-cmd-arg-nodisplay" value="-nosplash">
 		<isset property="isWindows"/>
 	</condition>
 	<condition property="matlab-cmd-arg-wait" value="-wait">
 		<isset property="isWindows"/>
 	</condition>
-	<property name="matlab-cmd-arg-display" value="-nodisplay"/>
+	<property name="matlab-cmd-arg-nodisplay" value="-nodisplay"/>
 	<property name="matlab-cmd-arg-wait" value=""/>
 	<property name="matlab-cmd-arg-run" value="-r"/>
 
@@ -19,17 +19,31 @@
 	<macrodef name="matlab">
 		<attribute name="fct"/>
 		<attribute name="dir" default="."/>
+		<attribute name="display" default="false"/>
+		<attribute name="quit" default="true"/>
 		<sequential>
+			<!-- Set run argument -->
+			<condition property="__arg_run" value="@{fct}">
+				<isfalse value="@{quit}"/>
+			</condition>
+			<property name="__arg_run" value="@{fct};quit"/>
+
+			<!-- Set display argument -->
+			<condition property="__arg_display" value="">
+				<istrue value="@{display}"/>
+			</condition>
+			<property name="__arg_display" value="${matlab-cmd-arg-nodisplay}"/>
+
 			<!-- Display matlab command -->
 			<echo message="Execute matlab inside directory @{dir}:"/>
-			<echo message="matlab ${matlab-cmd-arg-display} ${matlab-cmd-arg-wait} ${matlab-cmd-arg-run} '@{fct};quit'"/>
+			<echo message="matlab ${__arg_display} ${matlab-cmd-arg-wait} ${matlab-cmd-arg-run} '${__arg_run}'"/>
 
 			<!-- TODO Check that error canal works on Windows. Otherwise use output canal. -->
 			<exec executable="matlab" dir="@{dir}" errorproperty="matlab.err" failonerror="true">
-				<arg value="${matlab-cmd-arg-display}"/>
+				<arg value="${__arg_display}"/>
 				<arg value="${matlab-cmd-arg-wait}"/>
 				<arg value="${matlab-cmd-arg-run}"/>
-				<arg value="@{fct};quit"/>
+				<arg value="${__arg_run}"/>
 			</exec>
 
 			<!-- Display error messages -->
