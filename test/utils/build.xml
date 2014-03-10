@@ -1,6 +1,6 @@
 <project default="all">
 
-	<include file="../../../utils.xml" as="utils"/>
+	<include file="../../utils.xml" as="utils"/>
 
 	<!-- NESTED PROPERTIES -->
 	<target name="nested" depends="utils.nested">

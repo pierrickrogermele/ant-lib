@@ -1,7 +1,7 @@
 <project default="all">
 
 	<!-- include file to test -->
-	<include file="../../../compile.xml" as="compile"/>
+	<include file="../../compile.xml" as="compile"/>
 
 	<!-- directories -->
 	<property name="src.dir" value="src"/>
