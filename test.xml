@@ -6,9 +6,6 @@
 	<dirname property="fr.cea.ant.lib.test" file="${ant.file.fr.cea.ant.lib.test}" />
 
 	<!-- JUNIT -->
-	<condition property="junit.jar" value="/usr/share/java/junit.jar">
-		<isset property="isMac"/>
-	</condition>
 	<property name="junit.jar" value="${fr.cea.ant.lib.test}/junit-4.10.jar"/>
 
 </project>
