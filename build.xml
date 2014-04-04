@@ -12,7 +12,7 @@
 	<condition property="ant.jar" value="/usr/share/ant/lib/ant.jar">
 		<os family="unix"/>
 	</condition>
-	<condition property="ant.jar" value="C:/apache-ant-1.8.2/lib/ant.jar">
+	<condition property="ant.jar" value="C:/apache-ant-1.9.3/lib/ant.jar">
 		<os family="windows"/>
 	</condition>
 
