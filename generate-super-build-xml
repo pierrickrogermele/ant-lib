@@ -7,10 +7,20 @@ import argparse
 ##################
 
 def read_args():
+
+	# Define arguments
 	parser = argparse.ArgumentParser(description='Generates a build.xml file for a super project.')
 	parser.add_argument('-n', '--name', type=str, required=True, metavar='name', help='Name of the super project.')
 	parser.add_argument('-p', '--projects', type=str, nargs='*', metavar='project', help='list of subprojects.')
-	return parser.parse_args()
+
+	# Get arguments
+	args =  parser.parse_args()
+
+	# Accept comma separated value lists for multiple value arguments
+	if len(args.projects) == 1:
+		args.projects = args.projects[0].split(',')
+
+	return args
 
 ###################
 # GENERATE TARGET #
