@@ -17,7 +17,7 @@ def read_args():
 	args =  parser.parse_args()
 
 	# Accept comma separated value lists for multiple value arguments
-	if len(args.projects) == 1:
+	if args.projects is not None and len(args.projects) == 1:
 		args.projects = args.projects[0].split(',')
 
 	return args
@@ -29,13 +29,16 @@ def read_args():
 def generate_target(name, projects, subtarget=True):
 	print ''
 	print '\t<!-- {0} -->'.format(name.upper())
-	print '\t<target name="{0}">'.format(name)
-	for p in projects:
-		if subtarget:
-			print '\t\t<ant dir="{0}" target="{1}" inheritAll="false"/>'.format(p, name)
-		else:
-			print '\t\t<ant dir="{0}" inheritAll="false"/>'.format(p)
-	print '\t</target>'
+	if projects is None:
+		print '\t<target name="{0}"/>'.format(name)
+	else :
+		print '\t<target name="{0}">'.format(name)
+		for p in projects:
+			if subtarget:
+				print '\t\t<ant dir="{0}" target="{1}" inheritAll="false"/>'.format(p, name)
+			else:
+				print '\t\t<ant dir="{0}" inheritAll="false"/>'.format(p)
+		print '\t</target>'
 
 ######################
 # GENERATE BUILD XML #
