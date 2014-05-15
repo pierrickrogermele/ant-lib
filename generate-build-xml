@@ -55,7 +55,7 @@ def generate_includes(includes):
 # GENERATE BUILD XML #
 ######################
 
-def generate_build_xml(name, includes):
+def generate_build_xml(name, includes, dependencies):
 	print '<project name="{0}" default="all">'.format(name)
 	generate_dirname(name)
 	generate_dirs()
@@ -68,4 +68,4 @@ def generate_build_xml(name, includes):
 ########
 
 args = read_args()
-generate_build_xml(args.name, args.includes args.dependencies)
+generate_build_xml(args.name, args.includes, args.dependencies)
