@@ -1,11 +1,14 @@
 <!-- vi: se ft=ant: -->
 <project name="fr.cea.ant.lib.test">
+
+	<!-- DEPRECATED -->
+	<echo level="warning">WARNING (fr.cea.ant.lib): Importing test.xml is deprecated ! You must now include junit.xml.</echo>
 	
 	<include file="system.xml" as="system"/>
 
 	<dirname property="fr.cea.ant.lib.test" file="${ant.file.fr.cea.ant.lib.test}" />
 
 	<!-- JUNIT -->
-	<property name="junit.jar" value="${fr.cea.ant.lib.test}/junit-4.10.jar"/>
+	<property name="junit.jar" value="${fr.cea.ant.lib.junit}/junit-4.10.jar"/>
 
 </project>

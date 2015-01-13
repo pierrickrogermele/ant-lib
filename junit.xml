@@ -1,0 +1,14 @@
+<!-- vi: se ft=ant: -->
+<project name="fr.cea.ant.lib.junit">
+	
+	<include file="system.xml" as="system"/>
+
+	<dirname property="fr.cea.ant.lib.junit" file="${ant.file.fr.cea.ant.lib.junit}" />
+
+	<!-- JUNIT -->
+	<path id="junit.jar">
+		<fileset dir="${fr.cea.ant.lib.junit}" includes="junit-4.10.jar"/>
+	</path>
+
+</project>
+
