@@ -6,11 +6,17 @@
 
 	<!-- ANT JAR CLASSPATH -->
 	<!-- TODO remove this hardcoding -->
+	<condition property="ant.jar" value="/usr/local/Cellar/ant/1.9.4/libexec/lib/ant.jar">
+		<os family="mac"/>
+	</condition>
 	<condition property="ant.jar" value="/usr/local/Cellar/ant/1.9.3/libexec/lib/ant.jar">
 		<os family="mac"/>
 	</condition>
 	<condition property="ant.jar" value="/usr/share/ant/lib/ant.jar">
 		<os family="unix"/>
+	</condition>
+	<condition property="ant.jar" value="C:/apache-ant-1.9.4/lib/ant.jar">
+		<os family="windows"/>
 	</condition>
 	<condition property="ant.jar" value="C:/apache-ant-1.9.3/lib/ant.jar">
 		<os family="windows"/>
